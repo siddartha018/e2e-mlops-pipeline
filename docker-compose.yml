@@ -1,0 +1,40 @@
+version: "3.9"
+
+# Full-integration docker-compose for the flagship demo.
+# P2 (inference), P4 (vector), P5 (queue) are placeholder services until the
+# real projects are built. In their absence, run the pipeline with
+# `clients: { task_queue: local, vector_store: faiss_local, inference: local }`.
+
+services:
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./.mlops:/app/.mlops
+      - ./configs:/app/configs:ro
+    environment:
+      PYTHONUNBUFFERED: "1"
+    command: ["mlops-pipeline", "runs", "list"]
+    depends_on:
+      - inference-p2
+      - vector-p4
+      - queue-p5
+
+  # Placeholder for P2 CPU inference server. Swap this image when P2 ships.
+  inference-p2:
+    image: nginx:alpine
+    ports:
+      - "8002:80"
+
+  # Placeholder for P4 vector DB. Swap when P4 ships.
+  vector-p4:
+    image: nginx:alpine
+    ports:
+      - "8004:80"
+
+  # Placeholder for P5 task queue. Swap when P5 ships.
+  queue-p5:
+    image: nginx:alpine
+    ports:
+      - "8005:80"

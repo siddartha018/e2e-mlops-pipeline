@@ -1,0 +1,48 @@
+project: mlops-pipeline
+data:
+  name: sst2
+  dataset_source: huggingface
+  hf_name: sst2
+  text_column: sentence
+  label_column: label
+  train_size: 2000
+  val_size: 200
+  test_size: 200
+  random_seed: 42
+
+train:
+  model_name: prajjwal1/bert-tiny
+  max_length: 64
+  batch_size: 16
+  epochs: 1
+  learning_rate: 5.0e-5
+  weight_decay: 0.01
+  num_labels: 2
+  seed: 42
+
+encoder:
+  model_name: sentence-transformers/all-MiniLM-L6-v2
+  dim: 384
+  batch_size: 32
+
+drift:
+  psi_threshold: 0.2
+  wasserstein_threshold: 0.15
+  cosine_threshold: 0.15
+  window_size: 200
+
+promote:
+  metric: accuracy
+  higher_is_better: true
+  min_improvement: 0.0
+
+paths:
+  root: .mlops
+  manifests: .mlops/manifests
+  tracker_db: .mlops/tracker.sqlite
+  registry_db: .mlops/registry.sqlite
+
+clients:
+  task_queue: local
+  vector_store: faiss_local
+  inference: local
