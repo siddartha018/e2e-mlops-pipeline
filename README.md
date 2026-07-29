@@ -23,7 +23,7 @@ lands. Swapping between them is a config change, not a rewrite.
 
 ---
 
-## Elevator pitch (for the recruiter reading this)
+## High Level overview
 
 > "I built a CPU inference server, a vector database, and a distributed task
 > queue from scratch — and this project is the end-to-end MLOps pipeline that
