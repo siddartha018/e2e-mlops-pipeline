@@ -602,43 +602,7 @@ prior-projects/06-mlops-pipeline/
 
 ---
 
-## Anticipated questions
 
-**Q: What's the primary metric you optimize for?**
-A: Accuracy on SST-2 for the classifier, configurable via `promote.metric`
-in the config. The pipeline itself is metric-agnostic — the promotion gate
-takes any evaluator that returns a float and any `higher_is_better` boolean.
-
-**Q: How do you handle non-determinism in training?**
-A: All Python / NumPy / PyTorch seeds are fixed from `train.seed`.
-`PYTHONHASHSEED` is set. `torch.use_deterministic_algorithms(True)` is *not*
-enforced — the honest tradeoff is that full bit-level determinism across
-PyTorch versions is fragile. Aim: same seed + same version + same data =
-same metrics within a documented tolerance.
-
-**Q: How is data versioning done?**
-A: Content-addressed. Every parquet file lives in the CAS under
-`sha256(bytes)`. A dataset version is a JSON manifest listing the file
-hashes; the manifest itself is hashed, and that manifest hash is the dataset
-version stamped on every run.
-
-**Q: How does drift trigger a retrain?**
-A: The drift check is a scheduled pipeline job. On `verdict == "drift"`,
-the job submits a retrain job to the queue (currently manual; wiring the
-auto-submit is the last remaining implementation task).
-
-**Q: Why not Kubernetes?**
-A: Overkill for a solo portfolio project. Docker Compose is one deployment
-abstraction away from a Helm chart; the pipeline is stateless outside of
-`.mlops/` on a bind-mounted volume.
-
-**Q: What breaks first if you scale this up?**
-A: The SQLite tracker under high concurrent write load; `LocalRunner` isn't
-concurrent at all. Both are load-bearing choices for the local-dev
-experience — the production path routes writes through P5's workers and can
-swap SQLite for Postgres behind the same schema.
-
----
 
 ## References
 
